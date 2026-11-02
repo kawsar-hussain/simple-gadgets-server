@@ -68,6 +68,35 @@ async function run() {
       res.send(result);
     });
 
+    // update product by id or slug
+    app.put("/products/:identifier", async (req, res) => {
+      const identifier = req.params.identifier;
+      const updateData = { ...req.body };
+      delete updateData._id;
+      const query = ObjectId.isValid(identifier) ? { _id: new ObjectId(identifier) } : { slug: identifier };
+      const updateDoc = { $set: updateData };
+      const result = await productsCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
+    app.patch("/products/:identifier", async (req, res) => {
+      const identifier = req.params.identifier;
+      const updateData = { ...req.body };
+      delete updateData._id;
+      const query = ObjectId.isValid(identifier) ? { _id: new ObjectId(identifier) } : { slug: identifier };
+      const updateDoc = { $set: updateData };
+      const result = await productsCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
+    // delete product by id or slug
+    app.delete("/products/:identifier", async (req, res) => {
+      const identifier = req.params.identifier;
+      const query = ObjectId.isValid(identifier) ? { _id: new ObjectId(identifier) } : { slug: identifier };
+      const result = await productsCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // !CRUD OPERATION END
 
     app.get("/", (req, res) => {
