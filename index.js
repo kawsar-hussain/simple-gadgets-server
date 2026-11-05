@@ -94,6 +94,24 @@ async function run() {
       res.send(result);
     });
 
+    // brand route handler
+    const brandCollections = db.collection("brands");
+
+    // post brand data
+    app.post("/brands", async (req, res) => {
+      const formData = req.body;
+
+      const result = await brandCollections.insertOne(formData);
+
+      res.send(result);
+    });
+
+    // get brands
+    app.get("/brands", async (req, res) => {
+      const result = await brandCollections.find().toArray();
+      res.send(result);
+    });
+
     // !CRUD OPERATION END
 
     app.get("/", (req, res) => {
