@@ -33,6 +33,7 @@ async function run() {
 
     // get products
     app.get("/products", async (req, res) => {
+      console.log("GET ROUTE HIT");
       const result = await productsCollection.find().toArray();
       res.send(result);
     });
@@ -68,32 +69,28 @@ async function run() {
       res.send(result);
     });
 
-    // update product by id or slug
-    app.put("/products/:identifier", async (req, res) => {
-      const identifier = req.params.identifier;
-      const updateData = { ...req.body };
-      delete updateData._id;
-      const query = ObjectId.isValid(identifier) ? { _id: new ObjectId(identifier) } : { slug: identifier };
-      const updateDoc = { $set: updateData };
-      const result = await productsCollection.updateOne(query, updateDoc);
+    // update product data
+    app.patch("/products/:id", async (req, res) => {
+      console.log("PATCH ROUTE HIT");
+
+      const id = req.params.id;
+      const updatedProduct = req.body;
+
+      console.log("ID:", id);
+      console.log("Updated Product:", updatedProduct);
+
+      const result = await productsCollection.updateOne({ _id: new ObjectId(id) }, { $set: updatedProduct });
+
       res.send(result);
     });
 
-    app.patch("/products/:identifier", async (req, res) => {
-      const identifier = req.params.identifier;
-      const updateData = { ...req.body };
-      delete updateData._id;
-      const query = ObjectId.isValid(identifier) ? { _id: new ObjectId(identifier) } : { slug: identifier };
-      const updateDoc = { $set: updateData };
-      const result = await productsCollection.updateOne(query, updateDoc);
-      res.send(result);
-    });
+    app.delete("/products/:id", async (req, res) => {
+      const id = req.params.id;
 
-    // delete product by id or slug
-    app.delete("/products/:identifier", async (req, res) => {
-      const identifier = req.params.identifier;
-      const query = ObjectId.isValid(identifier) ? { _id: new ObjectId(identifier) } : { slug: identifier };
-      const result = await productsCollection.deleteOne(query);
+      const result = await productsCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
+
       res.send(result);
     });
 
