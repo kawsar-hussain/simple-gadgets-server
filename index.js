@@ -112,6 +112,60 @@ async function run() {
       res.send(result);
     });
 
+    // get brand by id or slug
+    app.get("/brands/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { slug: id };
+
+      const result = await brandCollections.findOne(query);
+
+      if (!result) {
+        return res.status(404).send({ message: "Brand not found" });
+      }
+
+      res.send(result);
+    });
+
+    // update brand by id or slug
+    app.patch("/brands/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedData = req.body;
+      console.log("id:---", id);
+      console.log("updated data:---", updatedData);
+
+      const query = { _id: new ObjectId(id) };
+      const result = await brandCollections.updateOne(query, { $set: updatedData });
+
+      res.send(result);
+    });
+
+    // delete brand data
+    // app.delete("/brands/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) };
+
+    //   const result = await brandCollections.deleteOne(query);
+    //   res.send(result);
+    // });
+
+    // delete multiple brand data
+    app.delete("/brands/bulk", async (req, res) => {
+      const { ids } = req.body;
+
+      console.log("ids:----", ids);
+
+      const query = {
+        _id: {
+          $in: ids.map((id) => new ObjectId(id)),
+        },
+      };
+
+      const result = await brandCollections.deleteMany(query);
+
+      res.send(result);
+    });
+
     // !CRUD OPERATION END
 
     app.get("/", (req, res) => {
